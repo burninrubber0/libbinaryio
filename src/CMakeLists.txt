@@ -10,6 +10,6 @@ file(GLOB_RECURSE SRC_FILES
 add_library(libbinaryio STATIC	${SRC_FILES}
 								${PUBLIC_HEADERS})
 
-set_property(TARGET libbinaryio PROPERTY CXX_STANDARD 14)
+set_property(TARGET libbinaryio PROPERTY CXX_STANDARD 17)
 set_property(TARGET libbinaryio PROPERTY PREFIX "")
 target_include_directories(libbinaryio PUBLIC ${LIBBINARYIO_ROOT}/include)
