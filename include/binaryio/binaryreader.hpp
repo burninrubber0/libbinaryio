@@ -1,7 +1,13 @@
 #pragma once
-#include "util.hpp"
 #include <ios>
-#include <tuple>
+#include <utility>
+#include "util.hpp"
+
+#ifndef NDEBUG
+#include <cassert>
+#else
+#include <iostream>
+#endif
 
 namespace binaryio
 {
@@ -20,9 +26,9 @@ namespace binaryio
 			for (auto i = 0U; i < sizeof(T); i++)
 			{
 				if (m_bigEndian)
-					result |= data[sizeof(T) - i - 1] << (i * 8);
+					result |= static_cast<uintmax_t>(data[sizeof(T) - i - 1]) << (i * 8);
 				else
-					result |= data[i] << (i * 8);
+					result |= static_cast<uintmax_t>(data[i]) << (i * 8);
 			}
 
 			Skip<T>();
@@ -30,9 +36,16 @@ namespace binaryio
 		}
 
 		template<typename T>
-		typename std::enable_if<HasValueType<T>::value, T>::type Read()
+		std::enable_if_t<HasValueType<T>::value, T> Read()
 		{
-			return ReadImpl<T>(std::make_index_sequence<sizeof(T) / sizeof(T::value_type)>{});
+			return ReadImpl<T>(std::make_index_sequence<sizeof(T) / sizeof(typename T::value_type)>{});
+		}
+
+		template<typename T>
+		std::enable_if_t<std::is_arithmetic_v<typename SafeUnderlyingType<T>::type> || HasValueType<T>::value> Verify(T comparison)
+		{
+			auto value = Read<T>();
+			VerifyImpl(value, comparison);
 		}
 
 		template<typename T>
@@ -59,9 +72,23 @@ namespace binaryio
 			return m_bigEndian;
 		}
 
+		void Set64BitMode(bool in64BitMode)
+		{
+			m_64BitMode = in64BitMode;
+		}
+
 		off_t GetOffset() const
 		{
 			return m_offset;
+		}
+
+		void Align();
+
+		uint64_t ReadPointer();
+		void SkipPointer();
+		void VerifyPointer(uint64_t comparison)
+		{
+			VerifyImpl(ReadPointer(), comparison);
 		}
 
 		std::string ReadString();
@@ -69,13 +96,31 @@ namespace binaryio
 
 	private:
 		template<typename T, size_t... Is>
-		typename std::enable_if<HasValueType<T>::value, T>::type ReadImpl(std::index_sequence<Is...>)
+		std::enable_if_t<HasValueType<T>::value, T> ReadImpl(std::index_sequence<Is...>)
 		{
-			return {(static_cast<void>(Is), Read<typename T::value_type>())...};
+			return { (static_cast<void>(Is), Read<typename T::value_type>())... };
+		}
+
+		template<typename T>
+		std::enable_if_t<std::is_arithmetic_v<typename SafeUnderlyingType<T>::type> || HasValueType<T>::value> VerifyImpl(T value, T comparison)
+		{
+#ifndef NDEBUG
+			assert(value == comparison);
+#else
+			if (value != comparison)
+			{
+				std::cout << "CRITICAL: Expected ";
+				std::cout.operator<<(comparison);
+				std::cout << " at 0x" << std::hex << GetOffset() << std::dec << " but got ";
+				std::cout.operator<<(value);
+				std::cout << "." << std::endl;
+			}
+#endif
 		}
 
 		const uint8_t *m_buffer;
 		bool m_bigEndian;
+		bool m_64BitMode;
 		off_t m_offset;
 	};
 }

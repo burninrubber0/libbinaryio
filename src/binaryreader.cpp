@@ -6,14 +6,41 @@ BinaryReader::BinaryReader(const uint8_t *buffer, bool bigEndian)
 {
 	m_buffer = buffer;
 	m_bigEndian = bigEndian;
+	m_64BitMode = false;
 	m_offset = 0;
 }
 
 BinaryReader BinaryReader::Copy() const
 {
 	auto fileStream = BinaryReader(m_buffer, m_bigEndian);
+	fileStream.Set64BitMode(m_64BitMode);
 	fileStream.Seek(m_offset);
 	return fileStream;
+}
+
+void BinaryReader::Align()
+{
+	m_offset = binaryio::Align(m_offset, m_64BitMode ? 8 : 4);
+}
+
+void BinaryReader::SkipPointer()
+{
+	Align();
+
+	if (m_64BitMode)
+		return Skip<uint64_t>();
+
+	Skip<uint32_t>();
+}
+
+uint64_t BinaryReader::ReadPointer()
+{
+	Align();
+
+	if (m_64BitMode)
+		return Read<uint64_t>();
+
+	return Read<uint32_t>();
 }
 
 std::string BinaryReader::ReadString()
@@ -22,6 +49,8 @@ std::string BinaryReader::ReadString()
 	char c;
 	while ((c = Read<char>()))
 		result.push_back(c);
+
+	Align();
 
 	return result;
 }

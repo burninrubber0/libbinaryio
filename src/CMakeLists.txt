@@ -1,6 +1,7 @@
 set(HEADER_DIR ${LIBBINARYIO_ROOT}/include/binaryio)
 set(PUBLIC_HEADERS	${HEADER_DIR}/binaryreader.hpp
-					${HEADER_DIR}/binarywriter.hpp)
+					${HEADER_DIR}/binarywriter.hpp
+					${HEADER_DIR}/util.hpp)
 
 file(GLOB_RECURSE SRC_FILES
 	"*.hpp"

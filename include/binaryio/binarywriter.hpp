@@ -22,8 +22,8 @@ namespace binaryio
 		template<typename T>
 		std::enable_if_t<HasValueType<T>::value && !HasColType<T>::value> Write(T value)
 		{
-			for (auto i = 0U; i < sizeof(T) / sizeof(T::value_type); i++)
-				m_outStream.write(reinterpret_cast<const char *>(&value[i]), sizeof(T::value_type));
+			for (auto i = 0U; i < sizeof(T) / sizeof(typename T::value_type); i++)
+				m_outStream.write(reinterpret_cast<const char *>(&value[i]), sizeof(typename T::value_type));
 
 			assert(!m_outStream.fail());
 		}
@@ -31,7 +31,7 @@ namespace binaryio
 		template<typename T>
 		std::enable_if_t<HasColType<T>::value> Write(T value)
 		{
-			for (auto i = 0U; i < sizeof(T) / sizeof(T::col_type); i++)
+			for (auto i = 0U; i < sizeof(T) / sizeof(typename T::col_type); i++)
 				Write(value[i]);
 		}
 
@@ -69,7 +69,7 @@ namespace binaryio
 			assert(!m_outStream.fail());
 		}
 
-		void Defer(std::function<void(BinaryWriter &writer)> deferWriteFn)
+		void Defer(const std::function<void(BinaryWriter &writer)> &deferWriteFn)
 		{
 			m_deferredWrites.push(deferWriteFn);
 		}
