@@ -107,7 +107,7 @@ namespace binaryio
 			{
 				m_outStream.seekp(0, std::ios::end);
 				const auto extensionSize = absoluteOffset - GetSize();
-				const auto buffer = new char[extensionSize];
+				const auto buffer = new char[extensionSize]();
 				m_outStream.write(buffer, extensionSize);
 				delete[] buffer;
 			}
