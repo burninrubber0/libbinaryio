@@ -14,7 +14,7 @@ namespace binaryio
 	class BinaryReader
 	{
 	public:
-		BinaryReader(const uint8_t *buffer, bool bigEndian);
+		BinaryReader(const uint8_t *buffer, bool bigEndian = false);
 		BinaryReader Copy() const;
 
 		template<typename T>
@@ -70,6 +70,11 @@ namespace binaryio
 		bool IsBigEndian() const
 		{
 			return m_bigEndian;
+		}
+
+		void SetBigEndian(bool bigEndian)
+		{
+			m_bigEndian = bigEndian;
 		}
 
 		void Set64BitMode(bool in64BitMode)
