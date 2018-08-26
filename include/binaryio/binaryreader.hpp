@@ -42,6 +42,17 @@ namespace binaryio
 		}
 
 		template<typename T>
+		std::enable_if_t<std::is_pointer_v<T>, T> Read(size_t size)
+		{
+			T result = new std::remove_pointer_t<T>[size];
+
+			for (auto i = 0U; i < size; i++)
+				result[i] = Read<std::remove_pointer_t<T>>();
+
+			return result;
+		}
+
+		template<typename T>
 		std::enable_if_t<std::is_arithmetic_v<typename SafeUnderlyingType<T>::type> || HasValueType<T>::value> Verify(T comparison)
 		{
 			auto value = Read<T>();

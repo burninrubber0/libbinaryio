@@ -46,6 +46,15 @@ namespace binaryio
 		}
 
 		template<typename T>
+		std::enable_if_t<std::is_pointer_v<T>> Write(T value, size_t size)
+		{
+			for (auto i = 0U; i < size; i++)
+				m_outStream.write(reinterpret_cast<const char *>(&value[i]), sizeof(std::remove_pointer_t<T>));
+
+			assert(!m_outStream.fail());
+		}
+
+		template<typename T>
 		std::enable_if_t<std::is_arithmetic_v<typename SafeUnderlyingType<T>::type> || std::is_constructible_v<T, const std::string &>> VisitAndWrite(off_t &offset, T value)
 		{
 			const auto prevPos = GetOffset();
