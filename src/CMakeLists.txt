@@ -15,6 +15,8 @@ set_property(TARGET libbinaryio PROPERTY CXX_STANDARD 17)
 set_property(TARGET libbinaryio PROPERTY PREFIX "")
 target_include_directories(libbinaryio PUBLIC ${LIBBINARYIO_ROOT}/include)
 
+set_property(TARGET libbinaryio PROPERTY POSITION_INDEPENDENT_CODE ON)
+
 install(TARGETS libbinaryio DESTINATION lib)
 install(FILES ${PUBLIC_HEADERS} DESTINATION include/binaryio)
 install(FILES ${LIBBINARYIO_ROOT}/LICENSE.md DESTINATION share/binaryio RENAME copyright)
