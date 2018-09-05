@@ -20,7 +20,12 @@ BinaryReader BinaryReader::Copy() const
 
 void BinaryReader::Align()
 {
-	m_offset = binaryio::Align(m_offset, m_64BitMode ? 8 : 4);
+	Align(m_64BitMode ? 8 : 4);
+}
+
+void BinaryReader::Align(uint_fast8_t byteAlignment)
+{
+	m_offset = binaryio::Align(m_offset, byteAlignment);
 }
 
 void BinaryReader::SkipPointer()
