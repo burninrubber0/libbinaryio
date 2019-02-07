@@ -62,10 +62,7 @@ std::string BinaryReader::ReadString()
 
 std::string BinaryReader::ReadString(size_t size)
 {
-	std::string result;
-	result.reserve(size);
-	for (auto i = 0U; i < size; i++)
-		result.push_back(Read<char>());
-
+	std::string result(m_buffer->begin() + m_offset, m_buffer->begin() + m_offset + size);
+	m_offset += size;
 	return result;
 }

@@ -46,10 +46,20 @@ namespace binaryio
 		template<typename T>
 		std::enable_if_t<std::is_pointer_v<T>, T> Read(size_t size)
 		{
-			T result = new std::remove_pointer_t<T>[size];
+			using R = std::remove_pointer_t<T>;
+			T result = new R[size];
 
-			for (auto i = 0U; i < size; i++)
-				result[i] = Read<std::remove_pointer_t<T>>();
+			if (sizeof(R) == 1)
+			{
+				// Faster read.
+				std::copy(m_buffer->begin() + m_offset, m_buffer->begin() + m_offset + size, result);
+				m_offset += size;
+			}
+			else
+			{
+				for (auto i = 0U; i < size; i++)
+					result[i] = Read<R>();
+			}
 
 			return result;
 		}
