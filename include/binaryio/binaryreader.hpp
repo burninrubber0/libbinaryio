@@ -1,5 +1,6 @@
 #pragma once
 #include <ios>
+#include <memory>
 #include <utility>
 #include <vector>
 #include "util.hpp"
