@@ -53,7 +53,7 @@ namespace binaryio
 			{
 				// Faster read.
 				std::copy(m_buffer->begin() + m_offset, m_buffer->begin() + m_offset + size, result);
-				m_offset += size;
+				Seek(static_cast<off_t>(size));
 			}
 			else
 			{
