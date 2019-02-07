@@ -1,6 +1,7 @@
 #pragma once
 #include <ios>
 #include <utility>
+#include <vector>
 #include "util.hpp"
 
 #ifndef NDEBUG
@@ -14,13 +15,14 @@ namespace binaryio
 	class BinaryReader
 	{
 	public:
-		BinaryReader(const uint8_t *buffer, bool bigEndian = false);
+		BinaryReader(std::shared_ptr<std::vector<uint8_t>> buffer, bool bigEndian = false);
+
 		BinaryReader Copy() const;
 
 		template<typename T>
 		std::enable_if_t<std::is_arithmetic_v<typename SafeUnderlyingType<T>::type>, T> Read()
 		{
-			const auto data = m_buffer + m_offset;
+			const auto data = m_buffer->begin() + m_offset;
 			uintmax_t result = 0;
 
 			for (auto i = 0U; i < sizeof(T); i++)
@@ -73,7 +75,7 @@ namespace binaryio
 				m_offset = offset;
 		}
 
-		const uint8_t *GetBuffer() const
+		std::shared_ptr<std::vector<uint8_t>> GetBuffer() const
 		{
 			return m_buffer;
 		}
@@ -135,7 +137,7 @@ namespace binaryio
 #endif
 		}
 
-		const uint8_t *m_buffer;
+		std::shared_ptr<std::vector<uint8_t>> m_buffer;
 		bool m_bigEndian;
 		bool m_64BitMode;
 		off_t m_offset;

@@ -2,7 +2,7 @@
 
 using namespace binaryio;
 
-BinaryReader::BinaryReader(const uint8_t *buffer, bool bigEndian)
+BinaryReader::BinaryReader(std::shared_ptr<std::vector<uint8_t>> buffer, bool bigEndian)
 {
 	m_buffer = buffer;
 	m_bigEndian = bigEndian;
