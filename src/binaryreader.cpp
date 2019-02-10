@@ -63,6 +63,6 @@ std::string BinaryReader::ReadString()
 std::string BinaryReader::ReadString(size_t size)
 {
 	std::string result(m_buffer->begin() + m_offset, m_buffer->begin() + m_offset + size);
-	Seek(static_cast<off_t>(size));
+	Seek(static_cast<off_t>(size), std::ios::cur);
 	return result;
 }
