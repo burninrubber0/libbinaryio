@@ -14,6 +14,25 @@ namespace binaryio
 		template<typename T>
 		std::enable_if_t<std::is_arithmetic_v<typename SafeUnderlyingType<T>::type>> Write(T value)
 		{
+			if (m_bigEndian)
+			{
+				union {
+					T val;
+					uint8_t bytes[sizeof(T)];
+				} processedValue;
+
+				processedValue.val = value;
+
+				for (auto i = 0U; i < sizeof(T) / 2; i++)
+				{
+					const auto tmp = processedValue.bytes[sizeof(T) - i - 1];
+					processedValue.bytes[sizeof(T) - i - 1] = processedValue.bytes[i];
+					processedValue.bytes[i] = tmp;
+				}
+
+				value = processedValue.val;
+			}
+
 			m_outStream.write(reinterpret_cast<const char *>(&value), sizeof(T));
 
 			assert(!m_outStream.fail());
@@ -23,9 +42,7 @@ namespace binaryio
 		std::enable_if_t<HasValueType<T>::value && !HasColType<T>::value> Write(T value)
 		{
 			for (auto i = 0U; i < sizeof(T) / sizeof(typename T::value_type); i++)
-				m_outStream.write(reinterpret_cast<const char *>(&value[i]), sizeof(typename T::value_type));
-
-			assert(!m_outStream.fail());
+				Write(value[i]);
 		}
 
 		template<typename T>
@@ -50,12 +67,10 @@ namespace binaryio
 		}
 
 		template<typename T>
-		std::enable_if_t<std::is_pointer_v<T>> Write(T value, size_t size)
+		std::enable_if_t<std::is_pointer_v<T>> Write(T value, size_t elementCount)
 		{
-			for (auto i = 0U; i < size; i++)
-				m_outStream.write(reinterpret_cast<const char *>(&value[i]), sizeof(std::remove_pointer_t<T>));
-
-			assert(!m_outStream.fail());
+			for (auto i = 0U; i < elementCount; i++)
+				Write(value[i]);
 		}
 
 		template<typename T>
@@ -145,8 +160,14 @@ namespace binaryio
 			return std::move(m_outStream);
 		}
 
+		void SetBigEndian(bool bigEndian)
+		{
+			m_bigEndian = bigEndian;
+		}
+
 	private:
 		std::stringstream m_outStream;
 		std::queue<std::function<void(BinaryWriter &writer)>> m_deferredWrites;
+		bool m_bigEndian = false;
 	};
 }
