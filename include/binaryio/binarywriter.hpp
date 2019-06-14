@@ -38,7 +38,11 @@ namespace binaryio
 		void Write(const std::string &value, bool nullTerminate = true)
 		{
 			if (value.empty())
-				return Write<uint32_t>(0);
+			{
+				if (nullTerminate)
+					Write<uint8_t>(0);
+				return;
+			}
 
 			m_outStream.write(value.c_str(), value.length() + (nullTerminate ? 1 : 0));
 
