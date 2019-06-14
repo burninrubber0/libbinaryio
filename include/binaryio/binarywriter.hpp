@@ -2,6 +2,7 @@
 #include <sstream>
 #include <fstream>
 #include <queue>
+#include <stack>
 #include <functional>
 #include <cassert>
 #include "util.hpp"
@@ -61,7 +62,7 @@ namespace binaryio
 				return;
 			}
 
-			m_outStream.write(value.c_str(), value.length() + (nullTerminate ? 1 : 0));
+			m_outStream.write(value.c_str(), value.length() + size_t(nullTerminate ? 1 : 0));
 
 			assert(!m_outStream.fail());
 		}
@@ -112,6 +113,18 @@ namespace binaryio
 
 			if (!m_deferredWrites.empty())
 				ProcessDeferQueue();
+		}
+
+		void PushAndClearDeferQueue()
+		{
+			m_pushedDeferredWrites.push(std::move(m_deferredWrites));
+			m_deferredWrites = {};
+		}
+
+		void PopDeferQueue()
+		{
+			m_deferredWrites = std::move(m_pushedDeferredWrites.top());
+			m_pushedDeferredWrites.pop();
 		}
 
 		void Seek(off_t offset, std::ios::seekdir seekdir = std::ios::beg)
@@ -173,6 +186,7 @@ namespace binaryio
 	private:
 		std::stringstream m_outStream;
 		std::queue<std::function<void(BinaryWriter &writer)>> m_deferredWrites;
+		std::stack<std::queue<std::function<void(BinaryWriter &writer)>>> m_pushedDeferredWrites;
 		bool m_bigEndian = false;
 	};
 }
