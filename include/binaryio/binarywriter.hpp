@@ -160,6 +160,11 @@ namespace binaryio
 			return std::move(m_outStream);
 		}
 
+		bool IsBigEndian() const
+		{
+			return m_bigEndian;
+		}
+
 		void SetBigEndian(bool bigEndian)
 		{
 			m_bigEndian = bigEndian;
