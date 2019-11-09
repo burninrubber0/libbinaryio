@@ -105,14 +105,11 @@ namespace binaryio
 
 		void ProcessDeferQueue()
 		{
-			for (auto i = 0U; i < m_deferredWrites.size(); i++)
+			while (!m_deferredWrites.empty())
 			{
 				m_deferredWrites.front()(*this);
 				m_deferredWrites.pop();
 			}
-
-			if (!m_deferredWrites.empty())
-				ProcessDeferQueue();
 		}
 
 		void PushAndClearDeferQueue()
