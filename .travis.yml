@@ -1,7 +1,6 @@
 # Cpp language
 language: cpp
-sudo: required
-dist: xenial
+dist: bionic
 
 # Compiler selection
 compiler:
@@ -11,8 +10,6 @@ compiler:
 # Build matrix
 addons:
   apt:
-    sources:
-        - ubuntu-toolchain-r-test
     packages:
         - g++-8
         - gcc-8
