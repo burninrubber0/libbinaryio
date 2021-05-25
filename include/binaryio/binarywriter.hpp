@@ -148,7 +148,7 @@ namespace binaryio
 			assert(!m_outStream.fail());
 		}
 
-		void Align(uint_fast8_t alignment)
+		void Align(uint_fast32_t alignment)
 		{
 			Seek(binaryio::Align(GetOffset(), alignment));
 		}

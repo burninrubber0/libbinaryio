@@ -30,8 +30,6 @@ void BinaryReader::Align(uint_fast8_t byteAlignment)
 
 void BinaryReader::SkipPointer()
 {
-	Align();
-
 	if (m_64BitMode)
 		return Skip<uint64_t>();
 
@@ -40,8 +38,6 @@ void BinaryReader::SkipPointer()
 
 uint64_t BinaryReader::ReadPointer()
 {
-	Align();
-
 	if (m_64BitMode)
 		return Read<uint64_t>();
 

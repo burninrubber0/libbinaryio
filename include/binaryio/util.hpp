@@ -40,7 +40,7 @@ namespace binaryio
 
 
 	template<typename T>
-	std::enable_if_t<std::is_integral_v<T>, T> Align(T value, uint_fast8_t byteAlignment)
+	std::enable_if_t<std::is_integral_v<T>, T> Align(T value, uint_fast32_t byteAlignment)
 	{
 		return byteAlignment * ((value + (byteAlignment - 1)) / byteAlignment);
 	}
